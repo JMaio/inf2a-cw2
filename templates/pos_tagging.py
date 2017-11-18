@@ -17,7 +17,7 @@ from statements import *
 # Tags for words playing a special role in the grammar:
 
 function_words_tags = [('a','AR'), ('an','AR'), ('and','AND'),
-     ('is','BEs'), ('are','BEp'), ('does','DOs'), ('do','DOp'), 
+     ('is','BEs'), ('are','BEp'), ('does','DOs'), ('do','DOp'),
      ('who','WHO'), ('which','WHICH'), ('Who','WHO'), ('Which','WHICH'), ('?','?')]
      # upper or lowercase tolerated at start of question.
 
@@ -25,14 +25,32 @@ function_words = [p[0] for p in function_words_tags]
 
 def unchanging_plurals():
     with open("sentences.txt", "r") as f:
+        cands = {}      # make set for recognising pos tags
+        pos = []        # store all (word, tag) tuples
+        plurals = []
         for line in f:
-            # add code here
+            pos += [(w,t) for (w,t) in (tuple(p.split('|')) for p in line.split()) if (t == "NNS" or t == "NN")]
+        for (w, t) in pos:
+            if (t == "NNS" or t == "NN"):
+                try:
+                    if t not in cands[w]:
+                        cands[w] += [t]
+                except KeyError:
+                    cands[w] = [t]
+
+        for w in cands:
+            if len(cands[w]) == 2:
+                plurals += [w]
+        return plurals
 
 unchanging_plurals_list = unchanging_plurals()
 
 def noun_stem (s):
-    """extracts the stem from a plural noun, or returns empty string"""    
-    # add code here
+    """extracts the stem from a plural noun, or returns empty string"""
+    if s in unchanging_plurals_list:
+        return s
+    elif True:
+        pass
 
 def tag_word (lx,wd):
     """returns a list of all possible tags for wd relative to lx"""

@@ -17,7 +17,8 @@ def add(lst, item):
 
 class Lexicon:
     """stores known word stems of various part-of-speech categories"""
-    lex = {}
+    def __init__(self):
+        self.lex = {}
 
     def add(self, stem, cat):
         if cat not in self.lex:
@@ -25,8 +26,10 @@ class Lexicon:
         self.lex[cat] += [stem]
 
     def getAll(self, cat):
-        return list(set(self.lex[cat]))
-
+        try:
+            return list(set(self.lex[cat]))
+        except KeyError:
+            return []
 
 
 class FactBase:
@@ -93,10 +96,10 @@ def verb_stem(s):
         'i',
         'o',
         's',
-        'x'
-        'z'
-        'ch'
-        'sh'
+        'x',
+        'z',
+        'ch',
+        'sh',
     ]
     if s == "has":  # has
         hyp = "have"
@@ -184,5 +187,3 @@ def process_statement(lx, wlist, fb):
 # print(verb_stem("analyzes"))
 # print(verb_stem("have"))
 # print(verb_stem("bathes"))
-
-
