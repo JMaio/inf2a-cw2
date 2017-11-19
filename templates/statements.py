@@ -64,7 +64,7 @@ class FactBase:
 import re
 from nltk.corpus import brown
 b = brown.tagged_words()
-
+vb = [(w, t) for (w, t) in b if (t == "VB" or t == "VBZ")]
 
 def verb_stem(s):
     """extracts the stem from the 3sg form of a verb, or returns empty string"""
@@ -89,8 +89,14 @@ def verb_stem(s):
         hyp = ""
 
     # check tags
-    hits  = [(w, t) for (w, t) in b if (w == s or w == hyp)]
-    t_s   = [t for (w, t) in hits if w == s and t == 'VBZ']
+    for (w, t) in c:
+        if s == w:
+            return hyp
+
+    hits  = [(w, t) for (w, t) in vb if (w == s or w == hyp)]
+
+    # print(c)
+    t_s   = [(w, t) for (w, t) in hits if w == s and t == 'VBZ']
     if t_s:
         return hyp
     else:
@@ -146,12 +152,20 @@ def process_statement(lx, wlist, fb):
 # print(fb.queryBinary("love","Mary","John")) # returns False
 
 # print(verb_stem("tells"))
+# print(verb_stem("says"))
+# print(verb_stem("ties"))
 # print(verb_stem("pays"))
 # print(verb_stem("unifies"))
 # print(verb_stem("ties"))
+# print(verb_stem("says"))
 # print(verb_stem("unties"))
+# print(verb_stem("says"))
+# print(verb_stem("says"))
 # print(verb_stem("attaches"))
 # print(verb_stem("analyzes"))
 # print(verb_stem("has"))
+# print(verb_stem("says"))
+# print(verb_stem("ties"))
 # print(verb_stem("bathes"))
 # print(verb_stem("flys"))
+# print(verb_stem("says"))
