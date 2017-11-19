@@ -63,6 +63,7 @@ class FactBase:
 
 import re
 from nltk.corpus import brown
+b = brown.tagged_words()
 
 
 def verb_stem(s):
@@ -121,10 +122,9 @@ def verb_stem(s):
         hyp = ""
 
     # check tags
-
-    b = brown.tagged_words()
-    t_s   = [t for (w, t) in b if t == 'VBZ' and w == s]
-    t_hyp = [t for (w, t) in b if t == 'VB'  and w == hyp]
+    hits  = [(w, t) for (w, t) in b if (w == s or w == hyp)]
+    t_s   = [t for (w, t) in hits if w == s and t == 'VBZ']
+    t_hyp = [t for (w, t) in hits if w == hyp and t == 'VB']
 
     if not (t_s and t_hyp):
         hyp = ""
@@ -172,18 +172,18 @@ def process_statement(lx, wlist, fb):
 # End of PART A.
 
 
-# fb = FactBase()
-# fb.addUnary("duck","John")
-# fb.addBinary("love","John","Mary")
-# print(fb.queryUnary("duck","John")) # returns True
-# print(fb.queryBinary("love","Mary","John")) # returns False
-#
-# print(verb_stem("shows"))
-# print(verb_stem("pays"))
-# print(verb_stem("unifies"))
-# print(verb_stem("ties"))
-# print(verb_stem("unties"))
-# print(verb_stem("attaches"))
-# print(verb_stem("analyzes"))
-# print(verb_stem("have"))
-# print(verb_stem("bathes"))
+fb = FactBase()
+fb.addUnary("duck","John")
+fb.addBinary("love","John","Mary")
+print(fb.queryUnary("duck","John")) # returns True
+print(fb.queryBinary("love","Mary","John")) # returns False
+
+print(verb_stem("shows"))
+print(verb_stem("pays"))
+print(verb_stem("unifies"))
+print(verb_stem("ties"))
+print(verb_stem("unties"))
+print(verb_stem("attaches"))
+print(verb_stem("analyzes"))
+print(verb_stem("have"))
+print(verb_stem("bathes"))
