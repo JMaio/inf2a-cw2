@@ -69,54 +69,21 @@ b = brown.tagged_words()
 def verb_stem(s):
     """extracts the stem from the 3sg form of a verb, or returns empty string"""
 
-    hyp = ""
-
-    vowels = [
-        'a',
-        'e',
-        'i',
-        'o',
-        'u',
-    ]
-    add_s_rule = vowels + [
-        's',
-        'x',
-        'y',
-        'z',
-        'ch',
-        'sh',
-    ]
-    add_es_rule = [
-        'o',
-        'x',
-        'ch',
-        'sh',
-        'zz',
-    ]
-    pre_e_rule = [
-        'i',
-        'o',
-        's',
-        'x',
-        'z',
-        'ch',
-        'sh',
-    ]
     if s == "has":  # has
         hyp = "have"
-    elif not re.search(r"\w(" + "|".join(add_s_rule) + r")s\b", s):     # eats, tells, shows
+    elif re.match(r"[a-z]+([^aeiousxyz]|([^cs]h))s\b", s):      # eats, tells, shows
         hyp = s[:-1]
-    elif re.search(r"\w(" + "|".join(vowels) + r")ys\b", s):            # pays, buys
+    elif re.match(r"[a-z]+[aeiou]ys\b", s):                     # pays, buys
         hyp = s[:-1]
-    elif re.search(r"\w([^(" + r")(".join(vowels) + r")])ies\b", s):    # flies, tries, unifies
-        hyp = s[:-3] + 'y'                                             # assume rules followed if pluralised
-    elif re.search(r"\wies\b", s):                                      # dies, lies, ties
+    elif re.match(r"[a-z]+[^aeiou]ies\b", s):                   # flies, tries, unifies
+        hyp = s[:-3] + 'y'                                      # assume rules followed if pluralised
+    elif re.match(r"[^aeiou]ies\b", s):                         # dies, lies, ties
         hyp = s[:-1]
-    elif re.search(r"\w(" + "|".join(add_es_rule) + r")es\b", s):       # goes, boxes, attaches, washes, dresses, fizzes
+    elif re.match(r"[a-z]+([ox]|[cs]h|[s]s|[z]z)es\b", s):      # goes, boxes, attaches, washes, dresses, fizzes
         hyp = s[:-2]
-    elif re.search(r"\w[^sz](se|ze)s\b", s):                            # loses, dazes, lapses, analyses
+    elif re.match(r"[a-z]+[^sz](se|ze)s\b", s):                 # loses, dazes, lapses, analyses
         hyp = s[:-1]
-    elif re.search(r"\w([^(" + r")(".join(pre_e_rule) + r")])s\b", s):  # likes, hates, bathes
+    elif re.match(r"[a-z]+([^iosxz]|([^cs]h))es\b", s):         # likes, hates, bathes
         hyp = s[:-1]
     else:
         hyp = ""
@@ -124,11 +91,12 @@ def verb_stem(s):
     # check tags
     hits  = [(w, t) for (w, t) in b if (w == s or w == hyp)]
     t_s   = [t for (w, t) in hits if w == s and t == 'VBZ']
-    t_hyp = [t for (w, t) in hits if w == hyp and t == 'VB']
-
-    if not (t_s and t_hyp):
+    if t_s:
+        return hyp
+    else:
+        t_hyp = [t for (w, t) in hits if w == hyp and t == 'VB']
+    if not (t_s or t_hyp):
         hyp = ""
-
     return hyp
 
 
@@ -171,19 +139,19 @@ def process_statement(lx, wlist, fb):
 
 # End of PART A.
 
+# fb = FactBase()
+# fb.addUnary("duck","John")
+# fb.addBinary("love","John","Mary")
+# print(fb.queryUnary("duck","John")) # returns True
+# print(fb.queryBinary("love","Mary","John")) # returns False
 
-fb = FactBase()
-fb.addUnary("duck","John")
-fb.addBinary("love","John","Mary")
-print(fb.queryUnary("duck","John")) # returns True
-print(fb.queryBinary("love","Mary","John")) # returns False
-
-print(verb_stem("shows"))
-print(verb_stem("pays"))
-print(verb_stem("unifies"))
-print(verb_stem("ties"))
-print(verb_stem("unties"))
-print(verb_stem("attaches"))
-print(verb_stem("analyzes"))
-print(verb_stem("have"))
-print(verb_stem("bathes"))
+# print(verb_stem("tells"))
+# print(verb_stem("pays"))
+# print(verb_stem("unifies"))
+# print(verb_stem("ties"))
+# print(verb_stem("unties"))
+# print(verb_stem("attaches"))
+# print(verb_stem("analyzes"))
+# print(verb_stem("has"))
+# print(verb_stem("bathes"))
+# print(verb_stem("flys"))
