@@ -34,7 +34,8 @@ class Lexicon:
 
 class FactBase:
     """stores unary and binary relational facts"""
-    fb = {}
+    def __init__(self):
+        self.fb = {}
 
     def addUnary(self, pred, e1):
         if pred not in self.fb:
@@ -71,27 +72,27 @@ def verb_stem(s):
 
     if s == "has":  # has
         hyp = "have"
-    elif re.match(r"[a-z]+([^aeiousxyz]|([^cs]h))s\b", s):      # eats, tells, shows
+    elif re.match(r"[A-z]+([^cs]hs|[^aeiousxyz\sh]s)\b", s):    # eats, tells, shows
         hyp = s[:-1]
-    elif re.match(r"[a-z]+[aeiou]ys\b", s):                     # pays, buys
+    elif re.match(r"[A-z]+[aeiou]ys\b", s):                     # pays, buys
         hyp = s[:-1]
-    elif re.match(r"[a-z]+[^aeiou]ies\b", s):                   # flies, tries, unifies
+    elif re.match(r"[A-z]+[^aeiou]ies\b", s):                   # flies, tries, unifies
         hyp = s[:-3] + 'y'                                      # assume rules followed if pluralised
     elif re.match(r"[^aeiou]ies\b", s):                         # dies, lies, ties
         hyp = s[:-1]
-    elif re.match(r"[a-z]+([ox]|[cs]h|[s]s|[z]z)es\b", s):      # goes, boxes, attaches, washes, dresses, fizzes
+    elif re.match(r"[A-z]+([ox]|[cs]h|[s]s|[z]z)es\b", s):      # goes, boxes, attaches, washes, dresses, fizzes
         hyp = s[:-2]
-    elif re.match(r"[a-z]+[^sz](se|ze)s\b", s):                 # loses, dazes, lapses, analyses
+    elif re.match(r"[A-z]+[^sz](se|ze)s\b", s):                 # loses, dazes, lapses, analyses
         hyp = s[:-1]
-    elif re.match(r"[a-z]+([^iosxz]|([^cs]h))es\b", s):         # likes, hates, bathes
+    elif re.match(r"[A-z]+([^iosxz]|([^cs]h))es\b", s):         # likes, hates, bathes
         hyp = s[:-1]
     else:
         hyp = ""
 
     # check tags
-    for (w, t) in c:
-        if s == w:
-            return hyp
+    # for (w, t) in c:
+    #     if s == w:
+    #         return hyp
 
     hits  = [(w, t) for (w, t) in vb if (w == s or w == hyp)]
 
@@ -145,6 +146,15 @@ def process_statement(lx, wlist, fb):
 
 # End of PART A.
 
+# lx = Lexicon()
+# lx.add("John","P")
+# lx.add("Mary","P")
+# lx.add("like","T")
+# lx.add("likes","T")
+# lx.add("fish","T")
+# lx.getAll("P")
+
+
 # fb = FactBase()
 # fb.addUnary("duck","John")
 # fb.addBinary("love","John","Mary")
@@ -152,7 +162,9 @@ def process_statement(lx, wlist, fb):
 # print(fb.queryBinary("love","Mary","John")) # returns False
 
 # print(verb_stem("tells"))
+# print(verb_stem("eats"))
 # print(verb_stem("says"))
+# print(verb_stem("shows"))
 # print(verb_stem("ties"))
 # print(verb_stem("pays"))
 # print(verb_stem("unifies"))
