@@ -43,7 +43,7 @@ def unchanging_plurals():
         return plurals
 
 unchanging_plurals_list = unchanging_plurals()
-print(sorted(unchanging_plurals_list))
+# print(sorted(unchanging_plurals_list))
 
 def noun_stem (s):
     """extracts the stem from a plural noun, or returns empty string"""
@@ -117,12 +117,13 @@ def tag_words (lx, wds):
 
 # End of PART B.
 
-lx = Lexicon()
-lx.add("John","P")
-lx.add("Mary","P")
-lx.add("like","T")
-lx.add("likes","T")
-lx.add("fish","T")
-lx.add("fish","I")
-lx.add("fish","N")
-lx.getAll("P")
+# lx = Lexicon()
+# lx.add("John","P")
+# lx.add("Mary","P")
+# lx.add("like","T")
+# lx.add("likes","T")
+# lx.add("fish","T")
+# lx.add("fish","I")
+# lx.add("fish","N")
+# lx.getAll("P")
+# print tag_words(lx, ["John", "fish"])

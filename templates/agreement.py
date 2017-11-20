@@ -84,14 +84,19 @@ def top_level_rule(tr):
         for t in tr:
             rule = rule + ' ' + label(t)
         return rule
-        
+
 def N_phrase_num(tr):
     """returns the number attribute of a noun-like tree, based on its head noun"""
+    print tr
     if (tr.label() == 'N'):
         return tr[0][1]  # the s or p from Ns or Np
     elif (tr.label() == 'Nom'):
         return N_phrase_num(tr[0])
-    elif  # add code here
+    elif (tr.label() == 'AN'):
+        return N_phrase_num(tr[0])
+    elif (tr.label() == 'NP'):
+        return N_phrase_num(tr[0])
+
 
 def V_phrase_num(tr):
     """returns the number attribute of a verb-like tree, based on its head verb,
@@ -100,19 +105,22 @@ def V_phrase_num(tr):
         return tr[0][1]  # the s or p from Is,Ts or Ip,Tp
     elif (tr.label() == 'VP'):
         return V_phrase_num(tr[0])
-    elif  # add code here
+    else:
+        return tr
 
 def matches(n1,n2):
     return (n1==n2 or n1=='' or n2=='')
 
 def check_node(tr):
     """checks agreement constraints at the root of tr"""
+    print (tr)
     rule = top_level_rule(tr)
     if (rule == 'S -> WHICH Nom QP QM'):
         return (matches (N_phrase_num(tr[1]), V_phrase_num(tr[2])))
     elif (rule == 'NP -> AR Nom'):
         return (N_phrase_num(tr[1]) == 's')
-    elif  # add code here
+    else:
+        pass  # add code here
 
 def check_all_nodes(tr):
     """checks agreement constraints everywhere in tr"""
@@ -131,7 +139,7 @@ def all_valid_parses(lx, wlist):
        that satisfy agreement constraints"""
     return [t for t in all_parses(wlist,lx) if check_all_nodes(t)]
 
-            
+
 # Converter to add words back into trees.
 # Strips singular verbs and plural nouns down to their stem.
 
@@ -169,4 +177,3 @@ if __name__ == "__main__":
     tr.draw()
 
 # End of PART C.
-
