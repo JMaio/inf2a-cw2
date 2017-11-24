@@ -78,6 +78,8 @@ def tag_word (lx,wd):
     full_tags = []
     for tag in tagset:
         base_tags += [tag for w in lx.getAll(tag) if w == wd]
+        base_tags += [tag for v in lx.getAll(tag) if v == verb_stem(wd)]
+        base_tags += [tag for n in lx.getAll(tag) if n == noun_stem(wd)]
     # if wd in function_words:
     #     tags += [t for (w, t) in function_words_tags if w == wd]
     if 'P' in base_tags:
@@ -117,13 +119,13 @@ def tag_words (lx, wds):
 
 # End of PART B.
 
-# lx = Lexicon()
-# lx.add("John","P")
-# lx.add("Mary","P")
-# lx.add("like","T")
-# lx.add("likes","T")
-# lx.add("fish","T")
-# lx.add("fish","I")
-# lx.add("fish","N")
-# lx.getAll("P")
-# print tag_words(lx, ["John", "fish"])
+lx = Lexicon()
+lx.add("John","P")
+lx.add("Mary","P")
+lx.add("like","T")
+lx.add("likes","T")
+lx.add("fish","T")
+lx.add("fish","I")
+lx.add("fish","N")
+lx.getAll("P")
+print tag_words(lx, ["John", "fish"])
