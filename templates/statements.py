@@ -31,6 +31,9 @@ class Lexicon:
         except KeyError:
             return []
 
+    def toString(self):
+        print self.lex
+
 
 class FactBase:
     """stores unary and binary relational facts"""
