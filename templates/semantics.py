@@ -17,15 +17,47 @@ def sem(tr):
     rule = top_level_rule(tr)
     if (tr.label() == 'P'):
         return tr[0][0]
-    elif (tr.label() == 'N'):
+    elif (tr.label() in ['N', 'A', 'I']):
         return '(\\x.' + tr[0][0] + '(x))'  # \\ is escape sequence for \
-    elif  # add code here
-    
-    elif (rule == 'AN -> A AN'):
-        return '(\\x.(' + sem(tr[0]) + '(x) & ' + sem(tr[1]) + '(x)))'
-    elif (rule == 'NP -> P'):
+    elif (tr.label() == 'T'):
+        return '(\\x. (\\y.' + tr[0][0] + '(x, y)))'
+
+    elif (rule == 'S -> WHO QP QM'):    # done
+        return '(\\x.%s(x))' % (sem(tr[1]))
+    elif (rule == 'S -> WHICH Nom QP QM'):  # done
+        return '(\\x.%s & %s(x))' % (sem(tr[1]), sem(tr[2]))
+    elif (rule == 'QP -> VP'):          # done
+        return '(\\x.%s(x))' % (sem(tr[0]))
+    elif (rule == 'QP -> DO NP T'):     # done
+        return '(\\x. (exists y. ((y = %s) & (%s)))(x))' % (sem(tr[1]), sem(tr[2]))
+    elif (rule == 'VP -> I'):           # done
+        return '(\\x.%s(x))' % (sem(tr[0]))
+    elif (rule == 'VP -> T NP'):        # done
+        return '(\\x. (exists y. ((y = %s) & (%s(y,x)))))' % (sem(tr[1]), sem(tr[0]))
+    elif (rule == 'VP -> BE A'):        # done
+        return '(\\x. %s(x))' % (sem(tr[1]))
+    elif (rule == 'VP -> BE NP'):       # done
+        return '(\\x. %s(x))' % (sem(tr[1]))
+    elif (rule == 'VP -> VP AND VP'):   # done
+        return '(\\x. (\\y. %s(x) & %s(y)))' % (sem(tr[0]), sem(tr[2]))
+    elif (rule == 'NP -> P'):           # done
         return '(\\x.(x = ' + sem(tr[0]) + '))'
-    elif  # add more code here
+    elif (rule == 'NP -> AR Nom'):      # done
+        return '(\\x. %s(x))' % (sem(tr[1]))
+    elif (rule == 'NP -> Nom'):         # done
+        return '(\\x. %s(x))' % (sem(tr[1]))
+    elif (rule == 'Nom  -> AN'):        # done
+        return '(\\x. %s(x))' % (sem(tr[0]))
+    elif (rule == 'Nom  -> AN Rel'):    
+        return '(\\x. %s(x))' % (sem(tr[1]))
+    elif (rule == 'AN -> N'):
+        return '(\\x.(' + sem(tr[0]) + ' & ' + sem(tr[1]) + '(x)))'
+    elif (rule == 'AN -> A AN'):
+        return '(\\x.(' + sem(tr[0]) + ' & ' + sem(tr[1]) + '(x)))'
+
+    # elif  # add more code here
+    else:
+        return '(\\x.x)'
 
 
 # Logic parser for lambda expressions
@@ -92,7 +124,7 @@ def fetch_input():
     s = raw_input('$$ ')
     while (s.split() == []):
         s = raw_input('$$ ')
-    return s    
+    return s
 
 def output(s):
     print ('     '+s)
@@ -147,7 +179,7 @@ def dialogue():
         else:
             output ("Please end with \".\" or \"?\" to avoid confusion.")
         s = fetch_input()
-            
+
 if __name__ == "__main__":
     dialogue()
 # End of PART D.
