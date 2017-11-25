@@ -87,7 +87,7 @@ def top_level_rule(tr):
 
 def N_phrase_num(tr):
     """returns the number attribute of a noun-like tree, based on its head noun"""
-    print tr
+    # print tr
     if (tr.label() == 'N'):
         return tr[0][1]  # the s or p from Ns or Np
     elif (tr.label() == 'Nom'):
