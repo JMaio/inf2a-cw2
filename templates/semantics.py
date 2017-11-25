@@ -15,47 +15,51 @@ from agreement import *
 def sem(tr):
     """translates a syntax tree into a logical lambda expression (in string form)"""
     rule = top_level_rule(tr)
+    print tr
     if (tr.label() == 'P'):
         return tr[0][0]
     elif (tr.label() in ['N', 'A', 'I']):
-        return '(\\x.' + tr[0][0] + '(x))'  # \\ is escape sequence for \
+        return '(\\x.%s(x))' % (tr[0][0])  # \\ is escape sequence for \
     elif (tr.label() == 'T'):
-        return '(\\x. (\\y.' + tr[0][0] + '(x, y)))'
+        return '(\\x. (\\y.%s(x, y)))' % (tr[0][0])
 
-    elif (rule == 'S -> WHO QP QM'):    # done
+    elif (rule == 'S -> WHO QP QM'):    # good
         return '(\\x.%s(x))' % (sem(tr[1]))
-    elif (rule == 'S -> WHICH Nom QP QM'):  # done
-        return '(\\x.%s & %s(x))' % (sem(tr[1]), sem(tr[2]))
-    elif (rule == 'QP -> VP'):          # done
+    elif (rule == 'S -> WHICH Nom QP QM'):  # good
+        return '(\\x.%s(x) & %s(x))' % (sem(tr[1]), sem(tr[2]))
+    elif (rule == 'QP -> VP'):          # good
         return '(\\x.%s(x))' % (sem(tr[0]))
     elif (rule == 'QP -> DO NP T'):     # done
-        return '(\\x. (exists y. ((y = %s) & (%s)))(x))' % (sem(tr[1]), sem(tr[2]))
+        return '(\\x. (exists y. ((y = %s) & (%s(y,x)))))' % (sem(tr[1]), sem(tr[2]))
     elif (rule == 'VP -> I'):           # done
         return '(\\x.%s(x))' % (sem(tr[0]))
     elif (rule == 'VP -> T NP'):        # done
-        return '(\\x. (exists y. ((y = %s) & (%s(y,x)))))' % (sem(tr[1]), sem(tr[0]))
-    elif (rule == 'VP -> BE A'):        # done
+        return '(\\x. (exists y. ((y = %s) & (%s(x,y)))))' % (sem(tr[1]), sem(tr[0]))
+    elif (rule == 'VP -> BE A'):        # good
         return '(\\x. %s(x))' % (sem(tr[1]))
-    elif (rule == 'VP -> BE NP'):       # done
+    elif (rule == 'VP -> BE NP'):       # good
         return '(\\x. %s(x))' % (sem(tr[1]))
     elif (rule == 'VP -> VP AND VP'):   # done
-        return '(\\x. (\\y. %s(x) & %s(y)))' % (sem(tr[0]), sem(tr[2]))
-    elif (rule == 'NP -> P'):           # done
-        return '(\\x.(x = ' + sem(tr[0]) + '))'
-    elif (rule == 'NP -> AR Nom'):      # done
+        return '(\\x. (%s(x) & %s(x)))' % (sem(tr[0]), sem(tr[2]))
+    elif (rule == 'NP -> P'):           # good
+        return '(\\x.(x = %s))' % (sem(tr[0]))
+    elif (rule == 'NP -> AR Nom'):      # good
         return '(\\x. %s(x))' % (sem(tr[1]))
-    elif (rule == 'NP -> Nom'):         # done
-        return '(\\x. %s(x))' % (sem(tr[1]))
-    elif (rule == 'Nom  -> AN'):        # done
+    elif (rule == 'NP -> Nom'):         # good
         return '(\\x. %s(x))' % (sem(tr[0]))
-    elif (rule == 'Nom  -> AN Rel'):    
-        return '(\\x. %s(x))' % (sem(tr[1]))
-    elif (rule == 'AN -> N'):
-        return '(\\x.(' + sem(tr[0]) + ' & ' + sem(tr[1]) + '(x)))'
-    elif (rule == 'AN -> A AN'):
-        return '(\\x.(' + sem(tr[0]) + ' & ' + sem(tr[1]) + '(x)))'
+    elif (rule == 'Nom -> AN'):         # good
+        return '(\\x. %s(x))' % (sem(tr[0]))
+    elif (rule == 'Nom -> AN Rel'):     # good
+        return '(\\x. (%s(x) & %s(x)) )' % (sem(tr[0]), sem(tr[1]))
+    elif (rule == 'AN -> N'):           # good
+        return '(\\x.%s(x))' % (sem(tr[0]))
+    elif (rule == 'AN -> A AN'):        # good
+        return '(\\x. (%s(x) & %s(x)))' % (sem(tr[0]), sem(tr[1]))
+    elif (rule == 'Rel -> WHO VP'):     # done
+        return '(\\x.%s(x))' % (sem(tr[1]))
+    elif (rule == 'Rel -> NP T'):       # done
+        return '(\\x. (exists y. ((y = %s) & %s(y,x)))))' % (sem(tr[0]), sem(tr[0]))
 
-    # elif  # add more code here
     else:
         return '(\\x.x)'
 
@@ -152,7 +156,7 @@ def dialogue():
                     tr = restore_words (trees[0],wds)
                     lam_exp = lp.parse(sem(tr))
                     L = lam_exp.simplify()
-                    # print L  # useful for debugging
+                    print L  # useful for debugging
                     entities = lx.getAll('P')
                     results = find_all_solutions (L,entities,fb)
                     if (results == []):
