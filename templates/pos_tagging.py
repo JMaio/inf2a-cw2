@@ -133,3 +133,4 @@ if __name__ == "__main__":
     lx.add("fish","N")
     lx.getAll("P")
     print tag_words(lx, ["John", "fish"])
+    print noun_stem("ashes")
