@@ -15,59 +15,86 @@ from agreement import *
 def sem(tr):
     """translates a syntax tree into a logical lambda expression (in string form)"""
     rule = top_level_rule(tr)
-    print rule
-    if (tr.label() == 'P'):
+    # print rule
+    if tr.label() == 'P':
         return tr[0][0]
-    elif (tr.label() in ['N', 'A', 'I']):
+    elif tr.label() in ['N', 'A', 'I', 'T']:
         return '(\\x.%s(x))' % (tr[0][0])  # \\ is escape sequence for \
-    elif (tr.label() == 'T'):
-        return '(\\x. (\\y.%s(x, y)))' % (tr[0][0])
 
-    elif (rule == 'S -> WHO QP QM'):    # good
-        return '(\\x.%s(x))' % (sem(tr[1]))
-    elif (rule == 'S -> WHICH Nom QP QM'):  # good
-        return '(\\x.%s(x) & %s(x))' % (sem(tr[1]), sem(tr[2]))
-    elif (rule == 'QP -> VP'):          # good
-        return '(\\x.%s(x))' % (sem(tr[0]))
-    elif (rule == 'QP -> DO NP T'):     # done
-        return '(\\x. (exists y. ((y = %s) & (%s(y,x)))))' % (sem(tr[1]), sem(tr[2]))
-    elif (rule == 'VP -> I'):           # done
-        return '(\\x.%s(x))' % (sem(tr[0]))
-    elif (rule == 'VP -> T NP'):        # done
-        if tr[1][0][0] == 'P':
-            return '(\\x. (exists y. %s & %s(x,y)))' % (sem(tr[1]), sem(tr[0]))
-        else:
-            return '(\\x. (exists y. %s(y) & %s(x,y)))' % (sem(tr[1]), sem(tr[0]))
-    elif (rule == 'VP -> BE A'):        # good
-        return '(\\x. %s(x))' % (sem(tr[1]))
-    elif (rule == 'VP -> BE NP'):       # good
-        return '(\\x. %s(x))' % (sem(tr[1]))
-    elif (rule == 'VP -> VP AND VP'):   # done
-        return '(\\x. (%s(x) & %s(x)))' % (sem(tr[0]), sem(tr[2]))
-    elif (rule == 'NP -> P'):           # good
-        return '(\\x.(x = %s))' % (sem(tr[0]))
-    elif (rule == 'NP -> AR Nom'):      # good
-        return '(\\x. %s(x))' % (sem(tr[1]))
-    elif (rule == 'NP -> Nom'):         # good
-        return '(\\x. %s(x))' % (sem(tr[0]))
-    elif (rule == 'Nom -> AN'):         # good
-        return '(\\x. %s(x))' % (sem(tr[0]))
-    elif (rule == 'Nom -> AN Rel'):     # good
-        return '(\\x. (%s(x) & %s(x)))' % (sem(tr[0]), sem(tr[1]))
-    elif (rule == 'AN -> N'):           # good
-        return '(\\x.%s(x))' % (sem(tr[0]))
-    elif (rule == 'AN -> A AN'):        # good
-        return '(\\x. (%s(x) & %s(x)))' % (sem(tr[0]), sem(tr[1]))
-    elif (rule == 'Rel -> WHO VP'):     # done
-        return '(\\x.%s(x))' % (sem(tr[1]))
-    elif (rule == 'Rel -> NP T'):       # done
-        return '(\\x. (exists y. (%s(y) & %s(y,x))))' % (sem(tr[0]), sem(tr[0]))
+    lambdas = {
+        'S -> WHO QP QM':       (r'(\\x. %s(x))', [1]),
+        'S -> WHICH Nom QP QM': (r'(\\x. (%s(x) & %s(x)))', [1, 2]),
+        'QP -> VP':             (r'(\\x. %s(x))', [0]),
+        # 'QP -> DO NP T':        (r'(\\x. (exists y. ((y = %s) & (%s(y,x)))))', [1, 2]),
+        'QP -> DO NP T':        (r'(\\x. (exists y. (%s(y) & %s(y,x))))', [1, 2]),
+        'VP -> I':              (r'(\\x. %s(x))', [0]),
+        'VP -> T NP':           (r'(\\x. (exists y. (%s(y) & %s(x,y))))', [1, 0]),
+        'VP -> BE A':           (r'(\\x. %s(x))', [1]),
+        'VP -> BE NP':          (r'(\\x. %s(x))', [1]),
+        'VP -> VP AND VP':      (r'(\\x. (%s(x) & %s(x)))', [0, 2]),
+        'NP -> P':              (r'(\\x. (x = %s))', [0]),
+        'NP -> AR Nom':         (r'(\\x. %s(x))', [1]),
+        'NP -> Nom':            (r'(\\x. %s(x))', [0]),
+        'Nom -> AN':            (r'(\\x. %s(x))', [0]),
+        'Nom -> AN Rel':        (r'(\\x. (%s(x) & %s(x)))', [0, 1]),
+        'AN -> N':              (r'(\\x. %s(x))', [0]),
+        'AN -> A AN':           (r'(\\x. (%s(x) & %s(x)))', [0, 1]),
+        'Rel -> WHO VP':        (r'(\\x. %s(x))', [1]),
+        'Rel -> NP T':          (r'(\\x. (exists y. (%s(y) & %s(y,x))))', [0, 1]),
+    }
 
-    else:
-        return '(\\x.x)'
+    # automate rule processing
+    (exp, inds) = lambdas[rule]
+    # print exp, inds
+    sub = []
+    for i in inds:
+        sub.append("sem(tr[%d])" % i)
+    # print sub
+    cmd = "'%s' %s (%s)" % (exp, "%", ','.join(sub))
+    # print cmd
+    return eval(cmd)
 
+    # legacy rules left for reference
+    # if rule == 'S -> WHO QP QM':
+    #     return '(\\x.%s(x))' % (sem(tr[1]))
+    # elif rule == 'S -> WHICH Nom QP QM':
+    #     return '(\\x.%s(x) & %s(x))' % (sem(tr[1]), sem(tr[2]))
+    # elif rule == 'QP -> VP':
+    #     return '(\\x.%s(x))' % (sem(tr[0]))
+    # elif rule == 'QP -> DO NP T':
+    #     return '(\\x. (exists y. ((y = %s) & (%s(y,x)))))' % (sem(tr[1]), sem(tr[2]))
+    # elif rule == 'VP -> I':
+    #     return '(\\x.%s(x))' % (sem(tr[0]))
+    # elif rule == 'VP -> T NP':
+    #     return '(\\x. (exists y. (%s(y) & %s(x, y))))' % (sem(tr[1]), sem(tr[0]))
+    # elif rule == 'VP -> BE A':
+    #     return '(\\x. %s(x))' % (sem(tr[1]))
+    # elif rule == 'VP -> BE NP':
+    #     return '(\\x. %s(x))' % (sem(tr[1]))
+    # elif rule == 'VP -> VP AND VP':
+    #     return '(\\x. (%s(x) & %s(x)))' % (sem(tr[0]), sem(tr[2]))
+    # elif rule == 'NP -> P':
+    #     return '(\\x.(x = %s))' % (sem(tr[0]))
+    # elif rule == 'NP -> AR Nom':
+    #     return '(\\x. %s(x))' % (sem(tr[1]))
+    # elif rule == 'NP -> Nom':
+    #     return '(\\x. %s(x))' % (sem(tr[0]))
+    # elif rule == 'Nom -> AN':
+    #     return '(\\x. %s(x))' % (sem(tr[0]))
+    # elif rule == 'Nom -> AN Rel':
+    #     return '(\\x. (%s(x) & %s(x)))' % (sem(tr[0]), sem(tr[1]))
+    # elif rule == 'AN -> N':
+    #     return '(\\x.%s(x))' % (sem(tr[0]))
+    # elif rule == 'AN -> A AN':
+    #     return '(\\x. (%s(x) & %s(x)))' % (sem(tr[0]), sem(tr[1]))
+    # elif rule == 'Rel -> WHO VP':
+    #     return '(\\x.%s(x))' % (sem(tr[1]))
+    # elif rule == 'Rel -> NP T':
+    #     return '(\\x. (exists y. (%s(y) & %s(y,x))))' % (sem(tr[0]), sem(tr[0]))
+    #
+    # # else:
+    # #     return '(\\x.x)'
 
-# Logic parser for lambda expressions
 
 from nltk.sem.logic import LogicParser
 lp = LogicParser()
@@ -87,7 +114,7 @@ from nltk.sem.logic import *
 # Can use: A.variable, A.term, A.term.first, A.term.second, A.function, A.args
 
 def interpret_const_or_var(s,bindings,entities):
-    print s, '\n', bindings, '\n', entities
+    # print s, '\n', bindings, '\n', entities
     if (s in entities): # s a constant
         return s
     else:               # s a variable
@@ -160,7 +187,7 @@ def dialogue():
                     tr = restore_words (trees[0],wds)
                     lam_exp = lp.parse(sem(tr))
                     L = lam_exp.simplify()
-                    print L # useful for debugging
+                    # print L # useful for debugging
                     entities = lx.getAll('P')
                     results = find_all_solutions (L,entities,fb)
                     if (results == []):
