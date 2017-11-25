@@ -42,10 +42,13 @@ def unchanging_plurals():
                 plurals += [w]
         return plurals
 
-unchanging_plurals_list = unchanging_plurals()
-# print(sorted(unchanging_plurals_list))
+unchanging_plurals_list = []
 
 def noun_stem (s):
+    global unchanging_plurals_list
+    if not unchanging_plurals_list:
+        unchanging_plurals_list = unchanging_plurals()
+        # print(sorted(unchanging_plurals_list))
     """extracts the stem from a plural noun, or returns empty string"""
     if s in unchanging_plurals_list:
         return s
@@ -119,13 +122,14 @@ def tag_words (lx, wds):
 
 # End of PART B.
 
-# lx = Lexicon()
-# lx.add("John","P")
-# lx.add("Mary","P")
-# lx.add("like","T")
-# lx.add("likes","T")
-# lx.add("fish","T")
-# lx.add("fish","I")
-# lx.add("fish","N")
-# lx.getAll("P")
-# print tag_words(lx, ["John", "fish"])
+if __name__ == "__main__":
+    lx = Lexicon()
+    lx.add("John","P")
+    lx.add("Mary","P")
+    lx.add("like","T")
+    lx.add("likes","T")
+    lx.add("fish","T")
+    lx.add("fish","I")
+    lx.add("fish","N")
+    lx.getAll("P")
+    print tag_words(lx, ["John", "fish"])
