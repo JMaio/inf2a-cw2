@@ -157,7 +157,8 @@ if __name__ == "__main__":
     lx.add("like","T")
     lx.add("likes","T")
     lx.add("fish","T")
-    lx.getAll("P")
+    print lx.getAll("P")
+    print lx.getAll("VBZ")
 
     fb = FactBase()
     fb.addUnary("duck","John")
@@ -165,6 +166,7 @@ if __name__ == "__main__":
     print(fb.queryUnary("duck","John")) # returns True
     print(fb.queryBinary("love","Mary","John")) # returns False
 
+    print(verb_stem("dazes"))
     print(verb_stem("tells"))
     print(verb_stem("eats"))
     print(verb_stem("says"))
