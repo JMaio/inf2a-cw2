@@ -15,7 +15,7 @@ from agreement import *
 def sem(tr):
     """translates a syntax tree into a logical lambda expression (in string form)"""
     rule = top_level_rule(tr)
-    print tr
+    print rule
     if (tr.label() == 'P'):
         return tr[0][0]
     elif (tr.label() in ['N', 'A', 'I']):
@@ -34,7 +34,10 @@ def sem(tr):
     elif (rule == 'VP -> I'):           # done
         return '(\\x.%s(x))' % (sem(tr[0]))
     elif (rule == 'VP -> T NP'):        # done
-        return '(\\x. (exists y. ((y = %s) & (%s(x,y)))))' % (sem(tr[1]), sem(tr[0]))
+        if tr[1][0][0] == 'P':
+            return '(\\x. (exists y. %s & %s(x,y)))' % (sem(tr[1]), sem(tr[0]))
+        else:
+            return '(\\x. (exists y. %s(y) & %s(x,y)))' % (sem(tr[1]), sem(tr[0]))
     elif (rule == 'VP -> BE A'):        # good
         return '(\\x. %s(x))' % (sem(tr[1]))
     elif (rule == 'VP -> BE NP'):       # good
@@ -50,7 +53,7 @@ def sem(tr):
     elif (rule == 'Nom -> AN'):         # good
         return '(\\x. %s(x))' % (sem(tr[0]))
     elif (rule == 'Nom -> AN Rel'):     # good
-        return '(\\x. (%s(x) & %s(x)) )' % (sem(tr[0]), sem(tr[1]))
+        return '(\\x. (%s(x) & %s(x)))' % (sem(tr[0]), sem(tr[1]))
     elif (rule == 'AN -> N'):           # good
         return '(\\x.%s(x))' % (sem(tr[0]))
     elif (rule == 'AN -> A AN'):        # good
@@ -58,7 +61,7 @@ def sem(tr):
     elif (rule == 'Rel -> WHO VP'):     # done
         return '(\\x.%s(x))' % (sem(tr[1]))
     elif (rule == 'Rel -> NP T'):       # done
-        return '(\\x. (exists y. ((y = %s) & %s(y,x)))))' % (sem(tr[0]), sem(tr[0]))
+        return '(\\x. (exists y. (%s(y) & %s(y,x))))' % (sem(tr[0]), sem(tr[0]))
 
     else:
         return '(\\x.x)'
@@ -84,6 +87,7 @@ from nltk.sem.logic import *
 # Can use: A.variable, A.term, A.term.first, A.term.second, A.function, A.args
 
 def interpret_const_or_var(s,bindings,entities):
+    print s, '\n', bindings, '\n', entities
     if (s in entities): # s a constant
         return s
     else:               # s a variable
@@ -156,7 +160,7 @@ def dialogue():
                     tr = restore_words (trees[0],wds)
                     lam_exp = lp.parse(sem(tr))
                     L = lam_exp.simplify()
-                    print L  # useful for debugging
+                    print L # useful for debugging
                     entities = lx.getAll('P')
                     results = find_all_solutions (L,entities,fb)
                     if (results == []):
