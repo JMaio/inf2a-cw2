@@ -10,9 +10,9 @@ $$  who is brown?
 appear to work, however the following cases are misinterpreted:
 $$  who is a bear?
         Eh??
-$$ who is a brown bear?
+$$  who is a brown bear?
         Eh??
-$$ which bear is brown?
+$$  which bear is brown?
         Eh??
 
 this could likely be deciphered with an extra function handling
