@@ -1,0 +1,27 @@
+1.
+attempting to play with the system, it does not seem to accept
+semi-complex statements very well.
+statements such as
+$$  Boo is a brown bear.
+        OK.
+and when querying for
+$$  who is brown?
+        Boo
+appear to work, however the following cases are misinterpreted:
+$$  who is a bear?
+        Eh??
+$$ who is a brown bear?
+        Eh??
+$$ which bear is brown?
+        Eh??
+
+this could likely be deciphered with an extra function handling
+the separation and tagging of the constituents of the statement,
+and adding them to the factbase individually.
+
+2.
+in addition, when parses are ambiguous, one could likely make
+use of, say, the Viterbi algorithm, taking statistics from the
+brown corpus which we are already using, as the basis for the
+probabilistic determination of the likeliest parse of any given
+question, while retaining the original grammar and language
