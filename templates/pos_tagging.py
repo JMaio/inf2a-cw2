@@ -119,13 +119,13 @@ def tag_words (lx, wds):
 
 # End of PART B.
 
-lx = Lexicon()
-lx.add("John","P")
-lx.add("Mary","P")
-lx.add("like","T")
-lx.add("likes","T")
-lx.add("fish","T")
-lx.add("fish","I")
-lx.add("fish","N")
-lx.getAll("P")
-print tag_words(lx, ["John", "fish"])
+# lx = Lexicon()
+# lx.add("John","P")
+# lx.add("Mary","P")
+# lx.add("like","T")
+# lx.add("likes","T")
+# lx.add("fish","T")
+# lx.add("fish","I")
+# lx.add("fish","N")
+# lx.getAll("P")
+# print tag_words(lx, ["John", "fish"])
